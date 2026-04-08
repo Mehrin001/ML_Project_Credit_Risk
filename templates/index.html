@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Risk Prediction</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="login-container">
+
+    <div class="login-card">
+        <h2>Loan Risk Check</h2>
+
+        <!-- Name -->
+        <input type="text" id="name" placeholder="Full Name" required>
+
+        <!-- Phone -->
+        <input type="tel" id="phone" placeholder="Phone Number" required>
+
+        <!-- Loan Amount -->
+        <input type="number" id="loan_amnt" placeholder="Loan Amount Requested" required>
+
+        <!-- Row: FICO + DTI -->
+        <div class="row">
+            <input type="number" id="fico" placeholder="FICO Score" required>
+            <input type="number" id="dti" placeholder="DTI (%)" required>
+        </div>
+        
+        <!-- Employ Length -->
+        <input type="number" id="emp_length" placeholder="Empolyement Year" required>
+
+        <!-- State Dropdown -->
+        <select id="state" required>
+            <option value="">Select State</option>
+            <option value='PA'>PA</option>
+            <option value='IL'>IL</option>
+            <option value='NJ'>NJ</option>
+            <option value='GA'>GA</option>
+            <option value='TX'>TX</option>
+            <option value='CA'>CA</option>
+            <option value='VA'>VA</option>
+            <option value='NY'>NY</option>
+            <option value='OH'>OH</option>
+            <option value='FL'>FL</option>
+            <option value='Other'>Other</option>
+        </select>
+
+        <button onclick="predict()" >Check Eligibility</button>
+
+        <!-- Result -->
+        <p id="result"></p>
+    </div>
+
+</div>
+
+<!-- <script src="/static/script.js"></script> -->
+ <script>
+function predict() {
+    const data = {
+        loan_amnt: document.getElementById("loan_amnt").value,
+        fico: document.getElementById("fico").value,
+        dti: document.getElementById("dti").value,
+        emp_length: document.getElementById("emp_length").value,
+        state: document.getElementById("state").value
+    };
+
+    fetch("/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result);
+        let status = result.prediction === 1 ? "Approved ✅" : "Rejected ❌";
+
+
+        document.getElementById("result").innerHTML = `
+            <b>Status:</b> ${status} <br>
+            <br>
+            <b>Recommended Amount:</b> $${result.recommended_amount} <br>
+            
+        `;
+    }).catch(error => console.error("Error:", error));
+}
+
+    //     document.getElementById("result").innerHTML =
+    //         "Status :" + status +
+    //         "<br>Recommended Amount: $" + result.recommended_amount;
+    //         // "<br>Prediction: " + result.prediction +
+    //         // "<br>Probability: " + result.probability;
+    // })
+    
+</script>
+
+</body>
+</html>
